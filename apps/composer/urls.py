@@ -24,6 +24,7 @@ urlpatterns = [
     path("compose/<uuid:post_id>/", views.compose, name="compose_edit"),
     # Save actions
     path("compose/save/", views.save_post, name="save_post"),
+    path("compose/quick-schedule/", views.quick_schedule, name="quick_schedule"),
     path("compose/<uuid:post_id>/save/", views.save_post, name="save_post_edit"),
     # Per-platform status transition (one PlatformPost at a time)
     path(

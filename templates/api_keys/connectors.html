@@ -1,0 +1,275 @@
+{% extends "layouts/settings.html" %}
+{% block title %}AI & MCP Connectors - Settings - RTK Studio{% endblock %}
+{% block content %}
+<div x-data="{
+    activeTab: 'chatgpt',
+    selectedKey: '{{ active_keys.0.plaintext_token|default:'' }}',
+    mcpUrl: '{{ mcp_url }}',
+    openapiUrl: '{{ openapiUrl }}',
+    copiedMcp: false,
+    copiedOpenapi: false,
+    copiedJson: false,
+    copyToClipboard(text, stateKey) {
+        navigator.clipboard.writeText(text);
+        this[stateKey] = true;
+        setTimeout(() => this[stateKey] = false, 2000);
+    }
+}">
+    <!-- Header with Tabs -->
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between mb-6 gap-4">
+        <div>
+            <div class="flex items-center gap-3">
+                <h2 class="text-xl font-semibold" style="color: var(--text-primary);">AI &amp; MCP Connectors</h2>
+                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    MCP Live
+                </span>
+            </div>
+            <p class="text-sm mt-1 max-w-xl" style="color: var(--text-tertiary);">
+                Hubungkan ChatGPT, Claude Desktop, Cursor, dan AI Agent eksternal ke Brightbean Studio secara langsung melalui Model Context Protocol (MCP) dan OpenAPI.
+            </p>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="flex items-center gap-1 bg-stone-100 p-1 rounded-xl self-start">
+            <a href="{% url 'api_keys:list' %}"
+               class="px-3.5 py-1.5 text-xs font-semibold text-stone-600 hover:text-stone-900 rounded-lg transition-colors">
+                API Keys
+            </a>
+            <span class="px-3.5 py-1.5 text-xs font-semibold text-stone-900 bg-white rounded-lg shadow-xs">
+                AI Connectors
+            </span>
+        </div>
+    </div>
+
+    {# Flash messages #}
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+        {% for message in messages %}
+        <div class="rounded-xl px-4 py-3 text-sm flex items-center justify-between"
+             style="background: var({% if message.tags == 'error' %}--error-soft, #FEE2E2{% else %}--surface-1, #F0FDF4{% endif %});
+                    color: var({% if message.tags == 'error' %}--text-primary{% else %}#166534{% endif %});
+                    border: 1px solid var({% if message.tags == 'error' %}--error-500, #EF4444{% else %}#BBF7D0{% endif %});">
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Revealed Token Banner if freshly generated #}
+    {% if reveal_token %}
+    <div class="mb-6 p-5 rounded-2xl bg-emerald-50 border border-emerald-200 shadow-sm" x-data="{ tokenCopied: false }">
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <h3 class="text-sm font-bold text-emerald-900">API Key Diterbitkan untuk {{ reveal_name }}</h3>
+            </div>
+            <span class="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded font-medium">Hanya tampil sekali</span>
+        </div>
+        <p class="text-xs text-emerald-800 mb-3">Simpan token ini sekarang. Token ini tidak akan dapat dilihat kembali setelah Anda meninggalkan halaman ini.</p>
+        <div class="flex items-center gap-2">
+            <input type="text" readonly value="{{ reveal_token }}"
+                   class="flex-1 font-mono text-xs px-3 py-2 bg-white border border-emerald-300 rounded-lg text-emerald-950 select-all outline-none">
+            <button type="button" @click="navigator.clipboard.writeText('{{ reveal_token }}'); tokenCopied = true; setTimeout(() => tokenCopied = false, 2000)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                <span x-text="tokenCopied ? 'Tersalin!' : 'Salin Token'"></span>
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Connector Platforms Switcher Tabs -->
+    <div class="flex items-center gap-3 border-b border-stone-200 mb-6">
+        <button type="button" @click="activeTab = 'chatgpt'"
+                class="pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 cursor-pointer"
+                :class="activeTab === 'chatgpt' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-stone-500 hover:text-stone-800'">
+            <div class="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-xs">GPT</div>
+            ChatGPT Connector (Actions &amp; MCP)
+        </button>
+        <button type="button" @click="activeTab = 'claude'"
+                class="pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 cursor-pointer"
+                :class="activeTab === 'claude' ? 'border-amber-600 text-amber-700' : 'border-transparent text-stone-500 hover:text-stone-800'">
+            <div class="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-700 font-black text-xs">C</div>
+            Claude Desktop &amp; Cursor MCP
+        </button>
+        <button type="button" @click="activeTab = 'catalog'"
+                class="pb-3 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 cursor-pointer ml-auto"
+                :class="activeTab === 'catalog' ? 'border-stone-800 text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800'">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Katalog Tool MCP ({{ mcp_tools|length }})
+        </button>
+    </div>
+
+    <!-- TAB 1: CHATGPT CONNECTOR -->
+    <div x-show="activeTab === 'chatgpt'" class="space-y-6">
+        <!-- ChatGPT Quick Action Banner -->
+        <div class="bg-gradient-to-br from-emerald-500/10 via-emerald-50/40 to-white p-6 rounded-2xl border border-emerald-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+                    Koneksi ChatGPT Langsung
+                </div>
+                <h3 class="text-lg font-bold text-stone-900">Hubungkan ChatGPT ke Brightbean Studio</h3>
+                <p class="text-sm text-stone-600 max-w-xl leading-relaxed">
+                    Izinkan ChatGPT untuk membuat postingan, menjadwalkan konten, melihat kalender, dan mengambil analytics media sosial Anda menggunakan Custom Actions atau Desktop MCP.
+                </p>
+            </div>
+
+            <form action="{% url 'api_keys:quick_connector_key' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="connector_type" value="chatgpt">
+                <button type="submit"
+                        class="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 rounded-xl shadow-sm transition-all duration-150 cursor-pointer flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Terbitkan API Key ChatGPT (1-Klik)
+                </button>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Mode A: ChatGPT Custom Actions (Web / Plus / Team / Enterprise) -->
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">A</div>
+                        <div>
+                            <h4 class="text-base font-bold text-stone-900">Mode 1: Custom GPT Action</h4>
+                            <p class="text-xs text-stone-500">Paling mudah untuk ChatGPT Web &amp; Mobile</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-stone-100 text-stone-600">OpenAPI Spec</span>
+                </div>
+
+                <div class="space-y-3 text-xs text-stone-600">
+                    <p class="font-medium text-stone-800">Langkah-langkah di <a href="https://chatgpt.com/gpts/editor" target="_blank" class="text-emerald-600 hover:underline font-bold">chatgpt.com</a>:</p>
+                    <ol class="list-decimal list-inside space-y-2 pl-1 leading-relaxed">
+                        <li>Buka <strong>GPT Editor</strong> &rarr; Tab <strong>Configure</strong> &rarr; Klik <strong>Create new action</strong>.</li>
+                        <li>Pada bagian <strong>Authentication</strong>, pilih <strong>API Key</strong>, Auth Type: <strong>Bearer</strong>, dan masukkan token API Key Anda.</li>
+                        <li>Pada bagian <strong>Schema</strong>, klik <strong>Import from URL</strong> lalu tempelkan URL skema di bawah ini:</li>
+                    </ol>
+
+                    <div class="flex items-center gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200">
+                        <code class="text-[11px] font-mono text-stone-800 flex-1 truncate select-all">{{ openapi_url }}</code>
+                        <button type="button" @click="copyToClipboard('{{ openapi_url }}', 'copiedOpenapi')"
+                                class="px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors cursor-pointer shrink-0">
+                            <span x-text="copiedOpenapi ? 'Tersalin!' : 'Salin URL'"></span>
+                        </button>
+                    </div>
+
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-[11px] text-amber-800">
+                        <strong class="font-semibold">Prompt Instruksi GPT yang Disarankan:</strong>
+                        <p class="mt-1 text-amber-900">"Anda adalah AI Social Media Manager untuk Brightbean Studio. Gunakan tindakan API yang tersedia untuk membuat draf konten, menjadwalkan postingan ke media sosial, dan mengecek performa konten."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mode B: ChatGPT Desktop MCP -->
+            <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-sm">B</div>
+                        <div>
+                            <h4 class="text-base font-bold text-stone-900">Mode 2: ChatGPT Desktop MCP</h4>
+                            <p class="text-xs text-stone-500">Koneksi native Model Context Protocol</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-violet-50 text-violet-700 border border-violet-200">MCP Transport</span>
+                </div>
+
+                <div class="space-y-3 text-xs text-stone-600">
+                    <p class="font-medium text-stone-800">Endpoint MCP Server Anda:</p>
+                    <div class="flex items-center gap-2 bg-stone-50 p-2.5 rounded-xl border border-stone-200">
+                        <code class="text-[11px] font-mono text-stone-800 flex-1 truncate select-all">{{ mcp_url }}</code>
+                        <button type="button" @click="copyToClipboard('{{ mcp_url }}', 'copiedMcp')"
+                                class="px-3 py-1.5 text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors cursor-pointer shrink-0">
+                            <span x-text="copiedMcp ? 'Tersalin!' : 'Salin Endpoint'"></span>
+                        </button>
+                    </div>
+
+                    <p class="font-medium text-stone-800 mt-2">Konfigurasi JSON (untuk Desktop MCP Connector):</p>
+                    <div class="relative bg-stone-900 rounded-xl p-3 text-stone-200 font-mono text-[11px] overflow-x-auto">
+                        <pre>{
+  "mcpServers": {
+    "brightbean-studio": {
+      "url": "{{ mcp_url }}",
+      "headers": {
+        "Authorization": "Bearer &lt;TOKEN_API_KEY_ANDA&gt;"
+      }
+    }
+  }
+}</pre>
+                        <button type="button"
+                                @click="copyToClipboard(JSON.stringify({mcpServers: {'brightbean-studio': {url: '{{ mcp_url }}', headers: {Authorization: 'Bearer YOUR_API_KEY'}}}}, null, 2), 'copiedJson')"
+                                class="absolute top-2 right-2 px-2.5 py-1 text-[10px] font-semibold bg-stone-700 hover:bg-stone-600 text-white rounded cursor-pointer">
+                            <span x-text="copiedJson ? 'Tersalin!' : 'Salin JSON'"></span>
+                        </button>
+                    </div>
+
+                    <p class="text-[11px] text-stone-500 leading-relaxed">
+                        ChatGPT Desktop akan langsung membaca skema 20 tool MCP Studio tanpa perlu setup manual satu per satu.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: CLAUDE DESKTOP & CURSOR -->
+    <div x-show="activeTab === 'claude'" class="space-y-6" style="display: none;">
+        <div class="bg-white p-6 rounded-2xl border border-stone-200 shadow-xs space-y-4">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-stone-900">Claude Desktop (Native Connector &amp; Config)</h3>
+                    <p class="text-xs text-stone-500 mt-0.5">Dua cara mudah menghubungkan Claude Desktop ke Brightbean Studio</p>
+                </div>
+                <form action="{% url 'api_keys:quick_connector_key' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="connector_type" value="claude">
+                    <button type="submit" class="px-4 py-2 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl transition-colors cursor-pointer">
+                        Terbitkan Key Claude MCP
+                    </button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-2">
+                    <h4 class="text-xs font-bold text-stone-800">1. Claude Desktop Settings &rarr; Connectors</h4>
+                    <p class="text-xs text-stone-600">Buka <strong>Settings &rarr; Connectors &rarr; Add Custom Connector</strong>, lalu masukkan URL Server:</p>
+                    <code class="block text-xs font-mono bg-white p-2 rounded border border-stone-200 select-all">{{ mcp_url }}</code>
+                    <p class="text-[11px] text-stone-500">Claude akan melakukan handshake OAuth 2.1 otomatis via browser.</p>
+                </div>
+                <div class="bg-stone-50 p-4 rounded-xl border border-stone-200 space-y-2">
+                    <h4 class="text-xs font-bold text-stone-800">2. File claude_desktop_config.json</h4>
+                    <p class="text-xs text-stone-600">Atau tambahkan ke file konfigurasi Claude Desktop Anda:</p>
+                    <pre class="bg-stone-900 text-stone-200 p-2.5 rounded-lg text-[10px] font-mono overflow-x-auto">"brightbean": {
+  "url": "{{ mcp_url }}",
+  "headers": {
+    "Authorization": "Bearer &lt;TOKEN_KEY&gt;"
+  }
+}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: MCP TOOLS CATALOG -->
+    <div x-show="activeTab === 'catalog'" class="space-y-4" style="display: none;">
+        <div class="bg-white p-5 rounded-2xl border border-stone-200 shadow-xs">
+            <h3 class="text-base font-bold text-stone-900 mb-1">Daftar Tool MCP yang Tersedia ({{ mcp_tools|length }})</h3>
+            <p class="text-xs text-stone-500 mb-4">Semua tool ini otomatis diekspos ke ChatGPT dan Claude saat terhubung.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {% for tool in mcp_tools %}
+                <div class="p-3.5 rounded-xl border border-stone-100 hover:border-stone-300 bg-stone-50/50 transition-all space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <code class="text-xs font-bold text-orange-600 font-mono">{{ tool.name }}</code>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-stone-200/70 text-stone-700">Tool</span>
+                    </div>
+                    <p class="text-xs text-stone-600 leading-snug">{{ tool.description }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

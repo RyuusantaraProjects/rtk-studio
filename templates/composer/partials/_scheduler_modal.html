@@ -1,0 +1,209 @@
+<!-- Quick Scheduler Modal Window ("Jendela Scheduler") -->
+<template x-teleport="body">
+    <div x-show="showSchedulerModal" x-cloak
+         class="fixed inset-0 z-[120] flex items-center justify-center p-4 overflow-y-auto"
+         style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px);"
+         @click.self="closeSchedulerModal()"
+         @keydown.escape.window="closeSchedulerModal()">
+
+        <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-stone-100 flex flex-col max-h-[92vh] transition-all"
+             @click.stop
+             x-show="showSchedulerModal"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+             x-transition:leave-end="opacity-0 scale-95 translate-y-2">
+
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-stone-100 bg-stone-50/60">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-orange-500 text-white flex items-center justify-center shadow-xs">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-stone-900 leading-none">Jendela Scheduler</h3>
+                        <p class="text-xs text-stone-400 mt-0.5">Jadwalkan postingan ke beberapa channel sekaligus</p>
+                    </div>
+                </div>
+                <button type="button" @click="closeSchedulerModal()"
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 transition-colors cursor-pointer"
+                        title="Tutup">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <form id="quick-scheduler-form"
+                  action="{% if request.workspace %}{% url 'composer:quick_schedule' workspace_id=request.workspace.id %}{% endif %}"
+                  method="post"
+                  enctype="multipart/form-data"
+                  @submit.prevent="submitQuickSchedule($event)"
+                  class="flex-1 overflow-y-auto p-6 space-y-5">
+                {% csrf_token %}
+
+                <!-- 1. Channel Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Pilih Channel Media Sosial</label>
+                    <div class="flex flex-wrap items-center gap-2">
+                        {% if sidebar_channels %}
+                            {% for ch in sidebar_channels %}
+                            <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold cursor-pointer transition-all select-none"
+                                   :class="schedulerSelectedChannels.includes('{{ ch.id }}') ? 'bg-orange-50 border-orange-400 text-orange-950 shadow-xs ring-1 ring-orange-400' : 'bg-stone-50 border-stone-200 text-stone-600 hover:border-stone-300'">
+                                <input type="checkbox" name="account_ids" value="{{ ch.id }}"
+                                       class="sr-only"
+                                       @change="toggleSchedulerChannel('{{ ch.id }}')"
+                                       :checked="schedulerSelectedChannels.includes('{{ ch.id }}')">
+                                <div class="w-4 h-4 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                                    {% include "partials/_platform_icon.html" with platform=ch.platform size="sm" %}
+                                </div>
+                                <span>{{ ch.account_name|default:ch.account_handle }}</span>
+                            </label>
+                            {% endfor %}
+                        {% else %}
+                            <div class="w-full flex items-center justify-between p-3 rounded-xl bg-stone-100 border border-stone-200 text-xs text-stone-700">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>Belum ada channel terhubung di workspace ini.</span>
+                                </div>
+                                {% if request.workspace %}
+                                <a href="{% url 'social_accounts:connect' workspace_id=request.workspace.id %}"
+                                   class="px-3 py-1.5 text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors shrink-0 flex items-center gap-1">
+                                    <span>+ Hubungkan Channel</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 2. Caption Textarea -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider">Konten / Caption Post</label>
+                        <span class="text-xs text-stone-400 font-mono" x-text="schedulerCaption.length + ' karakter'"></span>
+                    </div>
+                    <div class="relative rounded-2xl border border-stone-200 focus-within:border-orange-500 focus-within:ring-2 focus-within:ring-orange-100 transition-all bg-white overflow-hidden">
+                        <textarea name="caption" x-model="schedulerCaption" rows="4" required
+                                  placeholder="Tuliskan pesan yang menarik, cerita, promosi produk, atau informasi acara..."
+                                  class="w-full p-3.5 text-sm text-stone-900 placeholder-stone-400 outline-none resize-y min-h-[110px]"></textarea>
+
+                        <!-- Emoji & Tag Helpers -->
+                        <div class="flex items-center justify-between px-3 py-2 border-t border-stone-100 bg-stone-50/50">
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" @click="insertSchedulerEmoji('✨')" class="px-2 py-1 text-xs rounded hover:bg-stone-200/60 transition-colors">✨</button>
+                                <button type="button" @click="insertSchedulerEmoji('🔥')" class="px-2 py-1 text-xs rounded hover:bg-stone-200/60 transition-colors">🔥</button>
+                                <button type="button" @click="insertSchedulerEmoji('☕')" class="px-2 py-1 text-xs rounded hover:bg-stone-200/60 transition-colors">☕</button>
+                                <button type="button" @click="insertSchedulerEmoji('🚀')" class="px-2 py-1 text-xs rounded hover:bg-stone-200/60 transition-colors">🚀</button>
+                                <button type="button" @click="insertSchedulerEmoji('🎉')" class="px-2 py-1 text-xs rounded hover:bg-stone-200/60 transition-colors">🎉</button>
+                                <button type="button" @click="insertSchedulerHashtag('#Brightbean #SocialMedia')" class="px-2 py-1 text-[11px] font-semibold text-stone-600 rounded hover:bg-stone-200/60 transition-colors">#hashtags</button>
+                            </div>
+                            <button type="button" @click="openAiAssistantFromScheduler()"
+                                    class="text-xs text-emerald-700 hover:text-emerald-900 font-semibold flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <span>Tulis dengan AI</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Media Upload -->
+                <div>
+                    <label class="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2">Lampiran Media (Opsional)</label>
+                    <div class="flex items-center gap-3">
+                        <label class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-stone-300 rounded-xl text-xs font-medium text-stone-600 hover:border-orange-500 hover:text-orange-600 bg-stone-50 cursor-pointer transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            <span>Pilih Gambar / Video</span>
+                            <input type="file" name="media_files" multiple accept="image/*,video/*" class="sr-only" @change="handleSchedulerMediaSelect($event)">
+                        </label>
+                        <template x-for="(f, idx) in schedulerMediaPreviews" :key="idx">
+                            <div class="relative w-12 h-12 rounded-lg overflow-hidden border border-stone-200 group">
+                                <img :src="f.url" class="w-full h-full object-cover">
+                                <button type="button" @click="removeSchedulerMedia(idx)"
+                                        class="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- 4. Schedule Date & Time Controls -->
+                <div class="p-4 rounded-2xl bg-stone-50/80 border border-stone-200 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            Waktu Tayang
+                        </label>
+                        <span class="text-[11px] text-stone-500">Zona Waktu: <strong>{{ request.workspace.effective_timezone|default:"WIB / UTC" }}</strong></span>
+                    </div>
+
+                    <!-- Quick Preset Buttons -->
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="text-[11px] text-stone-400 font-medium mr-1">Preset Cepat:</span>
+                        <button type="button" @click="applySchedulePreset('today_17')"
+                                class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
+                                :class="schedulerPreset === 'today_17' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'">
+                            Hari ini 17:00
+                        </button>
+                        <button type="button" @click="applySchedulePreset('tomorrow_09')"
+                                class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
+                                :class="schedulerPreset === 'tomorrow_09' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'">
+                            Besok 09:00
+                        </button>
+                        <button type="button" @click="applySchedulePreset('tomorrow_14')"
+                                class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
+                                :class="schedulerPreset === 'tomorrow_14' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'">
+                            Besok 14:00
+                        </button>
+                        <button type="button" @click="applySchedulePreset('tomorrow_19')"
+                                class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
+                                :class="schedulerPreset === 'tomorrow_19' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'">
+                            Besok 19:00
+                        </button>
+                        <button type="button" @click="applySchedulePreset('monday_10')"
+                                class="px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors cursor-pointer"
+                                :class="schedulerPreset === 'monday_10' ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-100'">
+                            Senin 10:00
+                        </button>
+                    </div>
+
+                    <!-- Custom Inputs -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-stone-600 mb-1">Tanggal</label>
+                            <input type="date" name="scheduled_date" x-model="schedulerDate" required
+                                   class="w-full px-3 py-2 text-sm bg-white border border-stone-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 font-sans">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-stone-600 mb-1">Jam</label>
+                            <input type="time" name="scheduled_time" x-model="schedulerTime" required
+                                   class="w-full px-3 py-2 text-sm bg-white border border-stone-200 rounded-xl outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 font-sans">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Box -->
+                <div x-show="schedulerError" x-cloak class="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700" x-text="schedulerError"></div>
+
+                <!-- Modal Footer -->
+                <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                    <button type="button" @click="closeSchedulerModal()"
+                            class="px-4 py-2.5 text-sm font-semibold text-stone-600 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer">
+                        Batal
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <button type="submit"
+                                :disabled="isSchedulingSubmitting"
+                                class="px-6 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 rounded-xl shadow-md transition-all duration-150 cursor-pointer flex items-center gap-2"
+                                :class="isSchedulingSubmitting && 'opacity-60 cursor-not-allowed'">
+                            <svg x-show="isSchedulingSubmitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <span x-text="isSchedulingSubmitting ? 'Menjadwalkan...' : 'Jadwalkan Post'"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</template>

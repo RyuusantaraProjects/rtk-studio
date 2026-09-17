@@ -16,6 +16,8 @@ app_name = "api_keys"
 
 urlpatterns = [
     path("", views.list_keys, name="list"),
+    path("connectors/", views.connectors_view, name="connectors"),
+    path("connectors/quick-key/", views.quick_connector_key, name="quick_connector_key"),
     path("issue/", views.issue_key, name="issue"),
     path("<uuid:key_id>/revoke/", views.revoke_key, name="revoke"),
     path("<uuid:key_id>/edit/", views.edit_key, name="edit"),

@@ -532,3 +532,113 @@ def edit_key(request, key_id):
 
     messages.success(request, f"Updated “{key.name}”.")
     return redirect("api_keys:list")
+
+
+# ---------------------------------------------------------------------------
+# AI & MCP Connectors Hub (ChatGPT, Claude, OpenAPI)
+# ---------------------------------------------------------------------------
+
+
+@_require_manage_api_keys
+def connectors_view(request):
+    """Render the AI & MCP Connectors hub for ChatGPT, Claude, and external agents."""
+    org = request.org
+    workspaces = Workspace.objects.filter(organization=org).prefetch_related("social_accounts")
+    default_workspace = workspaces.first()
+
+    # Active keys
+    active_keys = ApiKey.objects.filter(
+        workspace__organization=org,
+        revoked_at__isnull=True,
+    ).select_related("workspace")
+
+    from apps.mcp.tools import all_tools
+
+    mcp_tools = all_tools()
+
+    base_url = request.build_absolute_uri("/").rstrip("/")
+    mcp_url = f"{base_url}/api/v1/mcp"
+    openapi_url = f"{base_url}/api/v1/openapi.json"
+
+    session = getattr(request, "session", None)
+    reveal_token = session.pop("quick_token", None) if session else None
+    reveal_name = session.pop("quick_key_name", None) if session else None
+
+    return render(
+        request,
+        "api_keys/connectors.html",
+        {
+            "settings_active": "connectors",
+            "org": org,
+            "workspaces": workspaces,
+            "default_workspace": default_workspace,
+            "active_keys": active_keys,
+            "mcp_tools": mcp_tools,
+            "mcp_url": mcp_url,
+            "openapi_url": openapi_url,
+            "reveal_token": reveal_token,
+            "reveal_name": reveal_name,
+        },
+    )
+
+
+@_require_manage_api_keys
+@require_http_methods(["POST"])
+def quick_connector_key(request):
+    """One-click API key generation pre-configured for ChatGPT or Claude MCP."""
+    org = request.org
+    connector_type = request.POST.get("connector_type", "chatgpt")  # "chatgpt" or "claude"
+    workspace_id = request.POST.get("workspace_id")
+
+    if workspace_id:
+        workspace = get_object_or_404(Workspace, id=workspace_id, organization=org)
+    else:
+        workspace = Workspace.objects.filter(organization=org).first()
+        if not workspace:
+            messages.error(request, "Tidak ada workspace aktif untuk menghubungkan key.")
+            return redirect("api_keys:connectors")
+
+    accounts = list(workspace.social_accounts.filter(connection_status=SocialAccount.ConnectionStatus.CONNECTED))
+    if not accounts:
+        messages.warning(
+            request,
+            "Belum ada channel media sosial yang terhubung di workspace ini. Silakan hubungkan akun media sosial Anda terlebih dahulu melalui menu Channels sebelum menerbitkan API Key.",
+        )
+        return redirect("api_keys:connectors")
+
+    label = "ChatGPT Connector" if connector_type == "chatgpt" else "Claude MCP Connector"
+    key_name = f"{label} ({workspace.name})"
+
+    # Permissions grantable to the user
+    user_perms = _grantable_permissions_for_user(request.user, workspace)
+    desired = [
+        "create_posts",
+        "publish_directly",
+        "view_analytics",
+        "use_inbox",
+        "reply_from_inbox",
+        "upload_media",
+        "manage_media",
+    ]
+    # Filter to only permissions the user actually holds in this workspace
+    permissions_to_grant = [p for p in desired if p in user_perms] or list(user_perms)
+
+    try:
+        issued = services.issue_api_key(
+            workspace=workspace,
+            social_accounts=accounts,
+            issued_by=request.user,
+            name=key_name,
+            permissions=permissions_to_grant,
+        )
+        request.session["quick_token"] = issued.plaintext_token
+        request.session["quick_key_name"] = key_name
+        messages.success(
+            request,
+            f"API Key '{key_name}' berhasil diterbitkan! Salin token sekarang untuk dimasukkan ke {label}.",
+        )
+    except Exception as exc:
+        messages.error(request, f"Gagal membuat API Key: {exc}")
+
+    return redirect("api_keys:connectors")
+

@@ -4015,3 +4015,145 @@ def _render_explore(request, workspace, category):
             "curated_feeds": curated,
         },
     )
+
+
+# ---------------------------------------------------------------------------
+# Quick Scheduler Modal View (Jendela Scheduler)
+# ---------------------------------------------------------------------------
+
+
+@login_required
+@require_permission("create_posts")
+@require_POST
+def quick_schedule(request, workspace_id):
+    """Jendela Scheduler endpoint: quickly schedules a post from the modal window."""
+    import zoneinfo
+    from datetime import date, datetime, time
+    from django.db import transaction
+    from django.http import JsonResponse
+    from apps.composer.models import PlatformPost, Post, PostMedia
+    from apps.composer.services import sync_post_scheduled_at
+    from apps.media_library.models import MediaAsset
+    from apps.social_accounts.models import SocialAccount
+
+    workspace = _get_workspace(request, workspace_id)
+    caption = request.POST.get("caption", "").strip()
+    title = request.POST.get("title", "").strip()
+    first_comment = request.POST.get("first_comment", "").strip()
+    publish_mode = request.POST.get("publish_mode", "schedule")
+    raw_date = request.POST.get("scheduled_date", "").strip()
+    raw_time = request.POST.get("scheduled_time", "").strip()
+
+    if not caption:
+        return JsonResponse({"success": False, "error": "Teks konten (caption) tidak boleh kosong."}, status=400)
+
+    account_ids = request.POST.getlist("account_ids")
+    if not account_ids:
+        raw_accts = request.POST.get("selected_accounts", "")
+        account_ids = [s.strip() for s in raw_accts.split(",") if s.strip() and _is_valid_uuid(s.strip())]
+
+    accounts = list(
+        SocialAccount.objects.filter(
+            id__in=account_ids,
+            workspace=workspace,
+            connection_status=SocialAccount.ConnectionStatus.CONNECTED,
+        )
+    )
+    if not accounts:
+        # If user didn't explicitly select, pick from connected accounts in the workspace
+        accounts = list(
+            workspace.social_accounts.filter(connection_status=SocialAccount.ConnectionStatus.CONNECTED)
+        )
+
+    if not accounts:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Belum ada channel media sosial yang terhubung di workspace ini. Silakan hubungkan channel Anda terlebih dahulu.",
+            },
+            status=400,
+        )
+
+    scheduled_at = None
+    if publish_mode == "schedule":
+        if not (raw_date and raw_time):
+            return JsonResponse({"success": False, "error": "Pilih tanggal dan jam jadwal."}, status=400)
+        try:
+            d_parts = [int(x) for x in raw_date.split("-")]
+            t_parts = [int(x) for x in raw_time.split(":")]
+            d = date(d_parts[0], d_parts[1], d_parts[2])
+            t = time(t_parts[0], t_parts[1])
+            tz = zoneinfo.ZoneInfo(workspace.effective_timezone or "UTC")
+            scheduled_at = datetime.combine(d, t).replace(tzinfo=tz)
+        except Exception as exc:
+            return JsonResponse({"success": False, "error": f"Format tanggal atau waktu tidak valid: {exc}"}, status=400)
+
+        if scheduled_at <= timezone.now():
+            return JsonResponse({"success": False, "error": "Waktu jadwal harus berada di masa mendatang."}, status=400)
+
+    media_asset_ids = request.POST.getlist("media_asset_ids")
+    uploaded_files = request.FILES.getlist("media_files")
+
+    for f in uploaded_files:
+        asset = MediaAsset.objects.create(
+            workspace=workspace,
+            file=f,
+            filename=f.name,
+            size_bytes=f.size,
+            mime_type=f.content_type,
+            uploaded_by=request.user,
+        )
+        media_asset_ids.append(str(asset.id))
+
+    status = "scheduled" if publish_mode == "schedule" else "draft"
+
+    with transaction.atomic():
+        post = Post.objects.create(
+            workspace=workspace,
+            author=request.user,
+            title=title,
+            caption=caption,
+            first_comment=first_comment,
+            scheduled_at=scheduled_at if publish_mode == "schedule" else None,
+            proposed_publish_at=scheduled_at if publish_mode != "schedule" else None,
+        )
+
+        for i, aid in enumerate(media_asset_ids):
+            try:
+                asset = MediaAsset.objects.get(id=aid, workspace=workspace)
+                PostMedia.objects.create(post=post, media_asset=asset, order=i)
+            except MediaAsset.DoesNotExist:
+                continue
+
+        for account in accounts:
+            PlatformPost.objects.create(
+                post=post,
+                social_account=account,
+                status=status,
+                scheduled_at=scheduled_at if publish_mode == "schedule" else None,
+            )
+
+        sync_post_scheduled_at(post)
+        _save_version(post, request.user)
+
+    msg = (
+        f"Post berhasil dijadwalkan untuk {scheduled_at.strftime('%d %b %Y %H:%M')}!"
+        if scheduled_at
+        else "Post berhasil disimpan sebagai draf!"
+    )
+
+    if (
+        request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or "application/json" in request.headers.get("Accept", "")
+    ):
+        return JsonResponse({
+            "success": True,
+            "post_id": str(post.id),
+            "message": msg,
+            "scheduled_at": scheduled_at.isoformat() if scheduled_at else None,
+            "channel_count": len(accounts),
+        })
+
+    messages.success(request, msg)
+    return redirect("calendar:calendar", workspace_id=workspace.id)
+
