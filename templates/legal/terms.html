@@ -1,0 +1,117 @@
+{% extends "legal/base_legal.html" %}
+
+{% block title %}Ketentuan Layanan (Terms of Service) · RTK Studio{% endblock %}
+{% block meta_description %}Ketentuan Layanan resmi RTK Studio untuk pengelolaan, penjadwalan, dan integrasi media sosial.{% endblock %}
+
+{% block content %}
+<div class="legal-card p-6 sm:p-10 mb-10">
+    <!-- Header -->
+    <div class="border-b border-stone-200 pb-6 mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-3" style="background-color: var(--brand-green-light); color: var(--brand-green-hover);">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Dokumen Resmi Pengguna
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Ketentuan Layanan (Terms of Service)
+        </h1>
+        <p class="text-sm text-stone-500 mt-2">
+            Terakhir diperbarui: <span class="font-medium text-stone-700">{{ last_updated }}</span>
+        </p>
+    </div>
+
+    <div class="prose-legal space-y-6">
+        <p>
+            Selamat datang di <strong>RTK Studio</strong> ("Layanan", "Aplikasi", "kami"). Dengan mengakses, mendaftar, atau menggunakan platform RTK Studio yang beralamat di <code>https://studio.rtk.my.id</code>, Anda menyetujui untuk terikat dengan Ketentuan Layanan ("Ketentuan") ini secara penuh. Jika Anda tidak menyetujui bagian mana pun dari Ketentuan ini, Anda tidak diperkenankan menggunakan Layanan kami.
+        </p>
+
+        <div class="callout-info">
+            <p class="font-medium text-green-900 text-sm">
+                <strong>Ringkasan Singkat:</strong> RTK Studio adalah platform manajemen konten dan otomatisasi media sosial. Anda tetap menjadi pemilik penuh konten Anda. Kami tidak menjual data Anda dan hanya menggunakan izin API yang Anda berikan untuk menjalankan fungsi penjadwalan, analitik, dan kotak masuk yang Anda minta.
+            </p>
+        </div>
+
+        <h2>1. Deskripsi Layanan</h2>
+        <p>
+            RTK Studio menyediakan perangkat lunak berbasis cloud yang memungkinkan kreator, agensi, dan bisnis untuk:
+        </p>
+        <ul>
+            <li>Menyusun, menjadwalkan, dan mempublikasikan konten ke berbagai jejaring sosial secara bersamaan.</li>
+            <li>Mengintegrasikan akun resmi pihak ketiga seperti <strong>Facebook, Instagram, Threads, TikTok, YouTube, LinkedIn, Pinterest</strong>, dan platform lainnya.</li>
+            <li>Mengelola kotak masuk interaksi (pesan langsung dan komentar publik) dalam satu dasbor terpadu.</li>
+            <li>Menganalisis performa postingan dan metrik interaksi media sosial.</li>
+            <li>Bekerja sama dalam tim melalui persetujuan konten (approval workflow) dan manajemen ruang kerja (workspace).</li>
+        </ul>
+
+        <h2>2. Pendaftaran Akun dan Keamanan</h2>
+        <p>
+            Untuk menggunakan Layanan, Anda diwajibkan membuat akun resmi:
+        </p>
+        <ul>
+            <li>Anda harus berusia minimal 18 tahun atau batas usia legal di yurisdiksi Anda untuk membuat kontrak hukum.</li>
+            <li>Anda wajib memberikan informasi yang akurat, lengkap, dan terkini saat pendaftaran.</li>
+            <li>Anda bertanggung jawab penuh atas kerahasiaan kata sandi, token API, dan aktivitas apa pun yang terjadi di bawah akun Anda.</li>
+            <li>Segera beri tahu kami jika Anda mencurigai adanya pelanggaran keamanan atau penggunaan akun tanpa izin.</li>
+        </ul>
+
+        <h2>3. Kepatuhan terhadap Kebijakan API Pihak Ketiga</h2>
+        <p>
+            Layanan kami berinteraksi langsung dengan antarmuka pemrograman aplikasi (API) resmi dari berbagai penyedia platform. Saat menghubungkan akun sosial media ke RTK Studio, Anda juga menyetujui untuk tunduk pada ketentuan masing-masing platform:
+        </p>
+        <ul>
+            <li><strong>Meta (Facebook, Instagram, Threads):</strong> Tunduk pada <a href="https://www.facebook.com/terms.php" target="_blank" rel="noopener" class="underline text-stone-800">Ketentuan Layanan Meta</a>, <a href="https://help.instagram.com/581066165581870" target="_blank" rel="noopener" class="underline text-stone-800">Ketentuan Penggunaan Instagram</a>, dan Kebijakan Platform Meta.</li>
+            <li><strong>Google / YouTube:</strong> Tunduk pada <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener" class="underline text-stone-800">Persyaratan Layanan YouTube</a> dan Kebijakan Privasi Google.</li>
+            <li><strong>TikTok:</strong> Tunduk pada Persyaratan Layanan Pengembang TikTok.</li>
+            <li><strong>LinkedIn:</strong> Tunduk pada Perjanjian Pengguna LinkedIn.</li>
+        </ul>
+        <p>
+            RTK Studio tidak bertanggung jawab atas tindakan penangguhan, pemblokiran, atau pembatasan yang diberlakukan langsung oleh pihak platform sosial jika konten atau tindakan Anda melanggar pedoman komunitas platform tersebut.
+        </p>
+
+        <h2>4. Hak Kekayaan Intelektual &amp; Konten Anda</h2>
+        <h3>Hak Milik Pengguna</h3>
+        <p>
+            Anda mempertahankan seluruh hak cipta dan kepemilikan penuh atas teks, gambar, video, dan materi lain ("Konten") yang Anda buat atau unggah ke RTK Studio. Kami tidak mengklaim kepemilikan apa pun atas Konten Anda.
+        </p>
+        <h3>Lisensi Operasional Terbatas</h3>
+        <p>
+            Dengan mengunggah Konten untuk dijadwalkan, Anda memberikan lisensi non-eksklusif, bebas royalti, dan terbatas kepada RTK Studio semata-mata untuk tujuan memproses, menyimpan, memformat, dan mentransmisikan Konten tersebut ke platform tujuan sesuai perintah Anda.
+        </p>
+
+        <h2>5. Penggunaan yang Dilarang (Acceptable Use)</h2>
+        <p>Anda setuju untuk tidak menggunakan Layanan untuk hal-hal berikut:</p>
+        <ul>
+            <li>Memublikasikan konten yang melanggar hukum, berunsur penipuan, fitnah, pornografi ilegal, ujaran kebencian, atau pelanggaran hak cipta pihak ketiga.</li>
+            <li>Melakukan aktivitas spamming, manipulasi engagement, bot otomatis yang melanggar ketentuan API platform terkait.</li>
+            <li>Mencoba meretas, membobol, mengganggu infrastruktur, atau melakukan reverse engineering terhadap kode RTK Studio.</li>
+            <li>Menyalahgunakan atau memperjualbelikan akses API Key tanpa izin tertulis.</li>
+        </ul>
+
+        <h2>6. Penghentian Layanan (Termination)</h2>
+        <p>
+            Anda dapat berhenti menggunakan Layanan kapan saja dengan menghapus akun Anda di menu Pengaturan Akun atau memutuskan sambungan akun media sosial Anda. Kami berhak menangguhkan atau menghentikan akses Anda jika ditemukan pelanggaran terhadap Ketentuan ini, dengan atau tanpa pemberitahuan sebelumnya.
+        </p>
+
+        <h2>7. Penafian Jaminan &amp; Batasan Tanggung Jawab</h2>
+        <p>
+            Layanan RTK Studio disediakan atas dasar <em>"SEBAGAIMANA ADANYA"</em> (AS IS) dan <em>"SEBAGAIMANA TERSEDIA"</em> tanpa jaminan apa pun, baik tersurat maupun tersirat. Kami tidak menjamin bahwa Layanan akan selalu bebas gangguan, tepat waktu, aman, atau bebas kesalahan teknis akibat kegagalan server upstream platform media sosial.
+        </p>
+        <p>
+            Sejauh diizinkan oleh hukum yang berlaku, RTK Studio dan pengembangnya tidak bertanggung jawab atas kerugian langsung, tidak langsung, insidental, atau hilangnya keuntungan yang timbul dari penggunaan atau ketidakmampuan menggunakan Layanan.
+        </p>
+
+        <h2>8. Perubahan Ketentuan</h2>
+        <p>
+            Kami dapat memperbarui Ketentuan Layanan ini dari waktu ke waktu. Setiap perubahan substansial akan diinformasikan melalui pengumuman di aplikasi atau melalui email terdaftar Anda. Penggunaan berkelanjutan setelah pembaruan menandakan persetujuan Anda terhadap Ketentuan yang baru.
+        </p>
+
+        <h2>9. Kontak Dukungan</h2>
+        <p>
+            Jika Anda memiliki pertanyaan mengenai Ketentuan Layanan ini, silakan hubungi kami melalui:
+        </p>
+        <ul>
+            <li><strong>Email Dukungan:</strong> <a href="mailto:support@rtk.my.id" class="text-stone-900 font-semibold underline">support@rtk.my.id</a></li>
+            <li><strong>Situs Resmi:</strong> <a href="https://studio.rtk.my.id" class="text-stone-900 font-semibold underline">https://studio.rtk.my.id</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

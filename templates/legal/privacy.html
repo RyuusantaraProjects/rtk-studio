@@ -1,0 +1,129 @@
+{% extends "legal/base_legal.html" %}
+
+{% block title %}Kebijakan Privasi (Privacy Policy) · RTK Studio{% endblock %}
+{% block meta_description %}Kebijakan Privasi resmi RTK Studio mengenai pengumpulan, penyimpanan, keamanan, dan perlindungan data pengguna serta integrasi API media sosial.{% endblock %}
+
+{% block content %}
+<div class="legal-card p-6 sm:p-10 mb-10">
+    <!-- Header -->
+    <div class="border-b border-stone-200 pb-6 mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-3" style="background-color: var(--brand-green-light); color: var(--brand-green-hover);">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            Perlindungan Privasi &amp; Data
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Kebijakan Privasi (Privacy Policy)
+        </h1>
+        <p class="text-sm text-stone-500 mt-2">
+            Terakhir diperbarui: <span class="font-medium text-stone-700">{{ last_updated }}</span>
+        </p>
+    </div>
+
+    <div class="prose-legal space-y-6">
+        <p>
+            Di <strong>RTK Studio</strong> ("kami", "aplikasi"), kami sangat menghargai dan memprioritaskan privasi Anda. Kebijakan Privasi ini menjelaskan bagaimana informasi Anda dikumpulkan, digunakan, dilindungi, dan dikelola saat Anda menggunakan layanan kami di <code>https://studio.rtk.my.id</code>.
+        </p>
+
+        <div class="callout-info">
+            <p class="font-medium text-green-900 text-sm">
+                <strong>Prinsip Utama:</strong> Kami <strong>TIDAK PERNAH</strong> menjual, menyewakan, atau memperjualbelikan data pribadi atau data akun media sosial Anda kepada pihak ketiga atau pengiklan mana pun. Semua data yang kami proses digunakan murni untuk memfasilitasi fungsionalitas yang Anda aktifkan secara eksplisit.
+            </p>
+        </div>
+
+        <h2>1. Informasi yang Kami Kumpulkan</h2>
+        <p>Kami mengumpulkan jenis data berikut sesuai dengan kebutuhan operasional layanan:</p>
+
+        <h3>A. Informasi Akun Pengguna</h3>
+        <ul>
+            <li><strong>Data Profil:</strong> Nama lengkap, alamat email, dan foto profil yang Anda sediakan saat pendaftaran atau login melalui Google Sign-In.</li>
+            <li><strong>Data Keamanan:</strong> Kata sandi (disimpan secara satu arah menggunakan algoritma hashing cryptographic yang kuat), stempel waktu persetujuan syarat &amp; ketentuan.</li>
+        </ul>
+
+        <h3>B. Informasi Akun Media Sosial yang Dihubungkan (via OAuth)</h3>
+        <p>
+            Saat Anda memilih untuk menghubungkan akun media sosial (Meta, Facebook, Instagram, Threads, TikTok, YouTube, LinkedIn, dll.), kami menerima data otorisasi resmi melalui protokol OAuth:
+        </p>
+        <ul>
+            <li><strong>Identitas Akun:</strong> Akun ID unik pihak ketiga (misal: Facebook Page ID, Instagram Business Account ID), nama akun, username/handle (@username), dan tautan foto avatar.</li>
+            <li><strong>Kredensial Otorisasi:</strong> Access Token dan Refresh Token OAuth. Kredensial ini <strong>selalu disimpan dalam keadaan terenkripsi kuat (AES-256)</strong> di basis data kami dan tidak pernah dibuka untuk publik.</li>
+            <li><strong>Statistik Publik Terbatas:</strong> Jumlah pengikut (follower count) untuk keperluan laporan ringkasan profil Anda.</li>
+        </ul>
+
+        <h3>C. Konten yang Dijadwalkan dan Media</h3>
+        <ul>
+            <li>Teks postingan, tag, keterangan (caption), serta file media (gambar, video) yang Anda unggah ke Pustaka Media kami untuk dipublikasikan.</li>
+            <li>Jadwal penerbitan dan status penerbitan postingan.</li>
+        </ul>
+
+        <h3>D. Data Interaksi Kotak Masuk (Inbox)</h3>
+        <ul>
+            <li>Komentar publik pada postingan yang Anda terbitkan dan pesan langsung (Direct Messages) yang dikirimkan oleh pengikut Anda ke akun bisnis yang terhubung, guna memungkinkan Anda membaca dan membalas pesan tersebut langsung dari antarmuka RTK Studio.</li>
+        </ul>
+
+        <h2>2. Penggunaan Izin Khusus Meta / Instagram</h2>
+        <p>
+            Untuk integrasi dengan <strong>Meta API (Facebook Login, Instagram Graph API, dan Instagram API with Instagram Login)</strong>, kami hanya meminta izin spesifik berikut dan menggunakannya untuk tujuan yang jelas:
+        </p>
+        <ul>
+            <li><code>instagram_business_basic</code>: Untuk mengidentifikasi akun bisnis Instagram Anda, menampilkan foto profil, dan memverifikasi status koneksi.</li>
+            <li><code>instagram_business_content_publish</code>: Digunakan hanya ketika Anda secara sengaja menjadwalkan atau mempublikasikan foto, video, Reels, atau carousel ke akun Instagram Anda.</li>
+            <li><code>instagram_business_manage_comments</code>: Digunakan untuk menampilkan komentar terbaru pada postingan Instagram Anda ke dalam Inbox RTK Studio dan mengirim balasan komentar dari Anda.</li>
+            <li><code>instagram_business_manage_messages</code>: Digunakan untuk menampilkan pesan langsung yang masuk dan memfasilitasi pengiriman balasan chat oleh tim Anda.</li>
+            <li><code>instagram_business_manage_insights</code>: Untuk menyajikan analitik performa postingan dan pertumbuhan jangkauan konten Anda dalam dasbor analitik.</li>
+            <li><code>pages_manage_posts</code>, <code>pages_read_engagement</code>, <code>pages_messaging</code>: Fungsi yang setara untuk Facebook Pages resmi Anda.</li>
+        </ul>
+
+        <h2>3. Bagaimana Kami Melindungi dan Menyimpan Data Anda</h2>
+        <p>
+            Keamanan data Anda adalah prioritas tertinggi kami:
+        </p>
+        <ul>
+            <li><strong>Enkripsi Tingkat Tinggi:</strong> Seluruh token OAuth dan kunci rahasia disimpan di database dengan enkripsi tingkat lanjut (enkripsi simetris AES).</li>
+            <li><strong>Koneksi Terenkripsi:</strong> Seluruh komunikasi antara peramban Anda, server RTK Studio, dan API platform pihak ketiga dienkripsi menggunakan HTTPS/TLS modern.</li>
+            <li><strong>Pemisahan Ruang Kerja (Workspace Isolation):</strong> Setiap organisasi dan workspace memiliki isolasi data yang ketat. Anggota tim hanya dapat melihat akun dan konten yang diizinkan oleh peran (role) mereka.</li>
+        </ul>
+
+        <h2>4. Pembagian Data dengan Pihak Ketiga</h2>
+        <p>
+            Kami tidak membagikan data pribadi Anda kepada pihak luar, kecuali dalam skenario operasional berikut:
+        </p>
+        <ul>
+            <li><strong>Penyedia Platform Media Sosial:</strong> Saat mempublikasikan konten atau mengambil pesan/analitik, data dikirim langsung ke server resmi penyedia platform (Meta, Google, TikTok, LinkedIn) sesuai permintaan Anda.</li>
+            <li><strong>Kepatuhan Hukum:</strong> Jika diwajibkan secara tegas oleh hukum, panggilan pengadilan, atau perintah pihak berwenang yang sah di Republik Indonesia.</li>
+        </ul>
+
+        <h2>5. Retensi dan Penyimpanan Data</h2>
+        <p>
+            Data Anda disimpan selama akun Anda aktif di RTK Studio:
+        </p>
+        <ul>
+            <li>Jika Anda memutuskan akun media sosial tertentu, seluruh token akses untuk akun tersebut akan <strong>seketika dihapus secara permanen</strong> dari basis data kami.</li>
+            <li>Jika Anda menghapus akun pengguna atau meminta penghapusan data, seluruh data pribadi, riwayat jadwal, dan token akan dimusnahkan.</li>
+        </ul>
+
+        <h2>6. Hak Pengguna dan Penghapusan Data (User Data Deletion)</h2>
+        <p>
+            Anda memiliki hak penuh untuk mengontrol data Anda:
+        </p>
+        <ul>
+            <li><strong>Hak Akses &amp; Pembaruan:</strong> Anda dapat memeriksa dan memperbarui informasi akun Anda kapan saja melalui dasbor pengaturan.</li>
+            <li><strong>Hak Pencabutan Akses:</strong> Anda dapat memutuskan koneksi akun media sosial kapan saja di menu <em>Settings &gt; Social Accounts</em>. Anda juga dapat mencabut izin aplikasi kami langsung dari menu pengaturan Facebook atau Instagram Anda.</li>
+            <li><strong>Hak Penghapusan Data:</strong> Kami menyediakan panduan langkah demi langkah dan saluran resmi untuk menghapus seluruh data Anda dari sistem kami. Silakan lihat <a href="{% url 'data_deletion' %}" class="text-stone-900 font-semibold underline">Panduan Penghapusan Data Pengguna</a> kami.</li>
+        </ul>
+
+        <h2>7. Perubahan Kebijakan Privasi</h2>
+        <p>
+            Kami dapat meninjau dan memperbarui Kebijakan Privasi ini secara berkala untuk mencerminkan perubahan fitur atau kepatuhan regulasi. Tanggal "Terakhir diperbarui" di bagian atas halaman ini akan selalu mencerminkan revisi terbaru.
+        </p>
+
+        <h2>8. Kontak dan Petugas Perlindungan Data</h2>
+        <p>
+            Jika Anda memiliki pertanyaan, keluhan, atau permohonan terkait privasi dan perlindungan data pribadi Anda, silakan hubungi kami di:
+        </p>
+        <ul>
+            <li><strong>Email Privasi &amp; Dukungan:</strong> <a href="mailto:support@rtk.my.id" class="text-stone-900 font-semibold underline">support@rtk.my.id</a></li>
+            <li><strong>Alamat Layanan:</strong> RTK Studio, Lampung, Indonesia</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "legal/base_legal.html" %}
+
+{% block title %}Panduan Penghapusan Data Pengguna (Data Deletion) · RTK Studio{% endblock %}
+{% block meta_description %}Petunjuk dan panduan resmi penghapusan data pengguna (User Data Deletion Instructions) untuk akun Facebook, Instagram, dan akun RTK Studio.{% endblock %}
+
+{% block content %}
+<div class="legal-card p-6 sm:p-10 mb-10">
+    <!-- Header -->
+    <div class="border-b border-stone-200 pb-6 mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold mb-3 bg-red-50 text-red-700 border border-red-200">
+            <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            Petunjuk Resmi Kepatuhan Meta (User Data Deletion)
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
+            Panduan Penghapusan Data Pengguna (User Data Deletion)
+        </h1>
+        <p class="text-sm text-stone-500 mt-2">
+            Terakhir diperbarui: <span class="font-medium text-stone-700">{{ last_updated }}</span>
+        </p>
+    </div>
+
+    {% if confirmation_code %}
+    <!-- Meta Data Deletion Confirmation Status Box -->
+    <div class="p-5 mb-8 rounded-xl bg-green-50 border border-green-200 text-green-900">
+        <div class="flex items-start gap-3">
+            <div class="p-2 bg-green-100 rounded-lg text-green-700 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-green-900">Permintaan Penghapusan Data Diterima</h3>
+                <p class="text-sm text-green-800 mt-1">
+                    Permintaan penghapusan data Anda telah dicatat oleh sistem dengan nomor konfirmasi:
+                </p>
+                <div class="mt-2 inline-block px-3 py-1 bg-white font-mono text-xs font-bold text-stone-800 rounded border border-green-300">
+                    ID Konfirmasi: {{ confirmation_code }}
+                </div>
+                <p class="text-xs text-green-700 mt-2">
+                    Status: <strong>Sedang Diproses / Data Purged</strong>. Seluruh token otorisasi dan salinan data yang bersangkutan telah dijadwalkan untuk dihapus secara permanen dari server kami dalam waktu 24 jam.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="prose-legal space-y-6">
+        <p>
+            Di <strong>RTK Studio</strong>, kami menghormati kendali dan kedaulatan Anda atas data pribadi Anda. Sesuai dengan <strong>Ketentuan Platform Meta (Meta Platform Terms)</strong>, <strong>General Data Protection Regulation (GDPR)</strong>, dan regulasi privasi data yang berlaku, Anda memiliki hak penuh untuk meminta penghapusan seluruh data akun Facebook, Instagram, atau data pengguna RTK Studio kapan saja.
+        </p>
+
+        <p>
+            Berikut adalah metode resmi yang dapat Anda pilih untuk menghapus data Anda:
+        </p>
+
+        <!-- Method 1 -->
+        <div class="p-5 rounded-xl border border-stone-200 bg-stone-50/70">
+            <h2 class="!mt-0 !pt-0 text-lg font-bold text-stone-900 flex items-center gap-2">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-stone-900 text-white text-xs font-bold">1</span>
+                Metode 1: Menghapus Akses Langsung dari Pengaturan Facebook / Instagram (Rekomendasi Meta)
+            </h2>
+            <p class="text-sm text-stone-600 mt-2">
+                Jika Anda ingin mencabut izin aplikasi RTK Studio dan meminta penghapusan riwayat data melalui akun Facebook Anda:
+            </p>
+            <ol class="mt-3 space-y-2 text-sm text-stone-700">
+                <li>Buka akun <strong>Facebook</strong> Anda, lalu klik foto profil Anda di pojok kanan atas.</li>
+                <li>Pilih <strong>Pengaturan &amp; Privasi (Settings &amp; Privacy)</strong>, kemudian klik <strong>Pengaturan (Settings)</strong>.</li>
+                <li>Pada bilah menu sebelah kiri, cari dan klik bagian <strong>Izin (Permissions)</strong> &rarr; lalu pilih <strong>Aplikasi dan Situs Web (Apps and Websites)</strong>.</li>
+                <li>Cari dan temukan <strong>RTK Studio</strong> pada daftar aplikasi yang aktif.</li>
+                <li>Klik tombol <strong>Hapus (Remove)</strong> di samping nama aplikasi RTK Studio.</li>
+                <li>(Opsional) Centang kotak yang menyatakan permintaan untuk menghapus riwayat interaksi atau postingan yang terkait dengan aplikasi, kemudian konfirmasikan dengan klik <strong>Hapus (Remove)</strong>.</li>
+            </ol>
+            <p class="text-xs text-stone-500 mt-3 italic">
+                * Setelah langkah ini diselesaikan, Meta akan secara otomatis membatalkan seluruh token otorisasi dan memberi tahu server kami untuk menghapus sesi data yang terhubung.
+            </p>
+        </div>
+
+        <!-- Method 2 -->
+        <div class="p-5 rounded-xl border border-stone-200 bg-stone-50/70">
+            <h2 class="!mt-0 !pt-0 text-lg font-bold text-stone-900 flex items-center gap-2">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-stone-900 text-white text-xs font-bold">2</span>
+                Metode 2: Memutuskan Akun dari Dasbor RTK Studio
+            </h2>
+            <p class="text-sm text-stone-600 mt-2">
+                Anda dapat memutuskan dan menghapus data sambungan media sosial tertentu langsung dari dalam dasbor:
+            </p>
+            <ol class="mt-3 space-y-2 text-sm text-stone-700">
+                <li>Masuk ke dasbor Anda di <a href="https://studio.rtk.my.id" class="text-stone-900 font-semibold underline">https://studio.rtk.my.id</a>.</li>
+                <li>Pilih ruang kerja (Workspace) Anda, lalu buka menu <strong>Settings (Pengaturan) &rarr; Social Accounts</strong>.</li>
+                <li>Cari kartu akun media sosial (Facebook, Instagram, Threads, dll.) yang ingin Anda putuskan.</li>
+                <li>Klik tombol <strong>Disconnect (Putuskan Sambungan)</strong>.</li>
+                <li>Konfirmasikan pemutusan.</li>
+            </ol>
+            <p class="text-xs text-stone-500 mt-3">
+                <strong>Apa yang terjadi setelahnya:</strong> Sistem RTK Studio secara seketika menghapus Access Token, Refresh Token, langganan Webhook, serta menghentikan seluruh aktivitas sinkronisasi analitik dan kotak masuk untuk akun tersebut.
+            </p>
+        </div>
+
+        <!-- Method 3 -->
+        <div class="p-5 rounded-xl border border-stone-200 bg-stone-50/70">
+            <h2 class="!mt-0 !pt-0 text-lg font-bold text-stone-900 flex items-center gap-2">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-stone-900 text-white text-xs font-bold">3</span>
+                Metode 3: Menghapus Seluruh Akun Pengguna RTK Studio
+            </h2>
+            <p class="text-sm text-stone-600 mt-2">
+                Jika Anda ingin menghapus seluruh profil dan data akun RTK Studio Anda secara menyeluruh:
+            </p>
+            <ol class="mt-3 space-y-2 text-sm text-stone-700">
+                <li>Buka menu <strong>Pengaturan Akun (Settings &rarr; Account Settings)</strong> di pojok profil Anda.</li>
+                <li>Gulir ke bagian paling bawah pada kartu <strong>Hapus Akun (Delete Account)</strong>.</li>
+                <li>Klik tombol <strong>Delete My Account</strong> dan konfirmasi tindakan Anda.</li>
+            </ol>
+            <p class="text-xs text-stone-500 mt-3">
+                Tindakan ini bersifat permanen dan tidak dapat dibatalkan. Seluruh data profil, riwayat login, draf konten, pustaka media, dan seluruh kredensial akun sosial yang terhubung akan dimusnahkan seketika dari database aktif kami.
+            </p>
+        </div>
+
+        <!-- Method 4 -->
+        <div class="p-5 rounded-xl border border-stone-200 bg-stone-50/70">
+            <h2 class="!mt-0 !pt-0 text-lg font-bold text-stone-900 flex items-center gap-2">
+                <span class="flex items-center justify-center w-7 h-7 rounded-full bg-stone-900 text-white text-xs font-bold">4</span>
+                Metode 4: Permohonan Penghapusan Data Manual Melalui Email Dukungan
+            </h2>
+            <p class="text-sm text-stone-600 mt-2">
+                Jika Anda sudah tidak memiliki akses ke akun RTK Studio atau akun media sosial Anda, Anda dapat mengirimkan permintaan penghapusan data secara manual kepada tim kami melalui email:
+            </p>
+            <div class="p-4 bg-white rounded-lg border border-stone-200 mt-3 text-xs sm:text-sm font-mono text-stone-800 space-y-1">
+                <p><strong>Kepada:</strong> support@rtk.my.id</p>
+                <p><strong>Subjek:</strong> Permohonan Penghapusan Data Pengguna - [Nama Lengkap Anda]</p>
+                <p class="pt-2 text-stone-600 font-sans">
+                    <strong>Isi Email:</strong><br>
+                    - Alamat email yang terdaftar pada akun RTK Studio Anda.<br>
+                    - Nama atau ID Pengguna Facebook / Akun Instagram yang ingin dihapus datanya.<br>
+                    - Pernyataan persetujuan penghapusan data secara permanen.
+                </p>
+            </div>
+            <p class="text-xs text-stone-500 mt-3">
+                Tim teknis kami akan memverifikasi kepemilikan akun Anda dan menyelesaikan proses pembersihan data dalam waktu maksimal <strong>3 &times; 24 jam kerja</strong>. Anda akan menerima email konfirmasi resmi setelah seluruh data dihapus secara tuntas.
+            </p>
+        </div>
+
+        <h2>Data Apa Saja yang Dihapus?</h2>
+        <p>Setelah proses penghapusan dieksekusi, data-data berikut akan dimusnahkan secara permanen:</p>
+        <ul>
+            <li>Token otorisasi OAuth (Access Token &amp; Refresh Token yang tersimpan).</li>
+            <li>Identitas profil media sosial yang tersimpan di basis data (ID, avatar URL, nama akun, handle).</li>
+            <li>File media (gambar/video) yang diunggah ke Pustaka Media Anda yang belum dipublikasikan.</li>
+            <li>Draf postingan, jadwal antrean, riwayat log aktivitas yang terkait dengan akun.</li>
+            <li>Riwayat pesan atau komentar inbox yang disimpan dalam basis data sementara.</li>
+        </ul>
+
+        <div class="callout-notice">
+            <p class="text-xs sm:text-sm text-yellow-900">
+                <strong>Catatan Penting:</strong> Konten yang sudah berhasil dipublikasikan ke media sosial Anda (misal postingan Facebook atau Instagram) sebelum proses penghapusan dilakukan akan tetap berada di akun media sosial Anda, kecuali Anda menghapusnya secara mandiri melalui aplikasi Facebook atau Instagram yang bersangkutan.
+            </p>
+        </div>
+
+        <h2>Kontak Bantuan</h2>
+        <p>
+            Jika Anda memiliki pertanyaan lebih lanjut seputar proses penghapusan data atau ingin menanyakan status permohonan Anda, hubungi tim kami di:
+        </p>
+        <ul>
+            <li><strong>Email:</strong> <a href="mailto:support@rtk.my.id" class="text-stone-900 font-semibold underline">support@rtk.my.id</a></li>
+            <li><strong>Layanan:</strong> RTK Studio Technical &amp; Compliance Team</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

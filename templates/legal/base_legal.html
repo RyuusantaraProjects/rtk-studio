@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Legal · RTK Studio{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Ketentuan Layanan, Kebijakan Privasi, dan Panduan Penghapusan Data Pengguna untuk RTK Studio.{% endblock %}">
+    <link rel="icon" href="{% static 'favicon/favicon.ico' %}" sizes="any">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon/favicon.svg' %}">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon/favicon-96x96.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <style>
+        :root {
+            --brand-green: #93a240;
+            --brand-green-hover: #849139;
+            --brand-green-light: rgba(147, 162, 64, 0.12);
+        }
+        body {
+            background-color: #faf9f6;
+            color: #292524;
+            font-family: var(--font-body, system-ui, -apple-system, sans-serif);
+            line-height: 1.65;
+        }
+        .legal-card {
+            background: #ffffff;
+            border: 1px solid #e7e5e4;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .nav-pill-active {
+            background-color: #ffffff;
+            color: #1c1917;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+        .prose-legal h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #1c1917;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #f5f5f4;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .prose-legal h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #292524;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .prose-legal p, .prose-legal li {
+            color: #57534e;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+        .prose-legal ul, .prose-legal ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .prose-legal li {
+            margin-bottom: 0.35rem;
+        }
+        .callout-info {
+            background-color: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+        .callout-notice {
+            background-color: #fefce8;
+            border-left: 4px solid #ca8a04;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.25rem 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-30 bg-white/90 backdrop-blur border-b border-stone-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <!-- Brand -->
+            <a href="/" class="flex items-center gap-3 group">
+                <img src="{% static 'img/brightbean-studio-logo.webp' %}" alt="RTK Studio" class="w-8 h-8 object-contain">
+                <div>
+                    <span class="font-bold text-stone-900 text-base tracking-tight block leading-tight">RTK Studio</span>
+                    <span class="text-[10px] uppercase font-semibold tracking-wider text-stone-400 block">Legal &amp; Compliance</span>
+                </div>
+            </a>
+
+            <!-- Nav Tabs -->
+            <nav class="hidden md:flex items-center bg-stone-100 p-1 rounded-xl text-xs font-medium text-stone-600">
+                <a href="{% url 'terms' %}" class="px-3 py-1.5 rounded-lg transition-all {% if active_tab == 'terms' %}nav-pill-active{% else %}hover:text-stone-900{% endif %}">
+                    Ketentuan Layanan
+                </a>
+                <a href="{% url 'privacy' %}" class="px-3 py-1.5 rounded-lg transition-all {% if active_tab == 'privacy' %}nav-pill-active{% else %}hover:text-stone-900{% endif %}">
+                    Kebijakan Privasi
+                </a>
+                <a href="{% url 'data_deletion' %}" class="px-3 py-1.5 rounded-lg transition-all {% if active_tab == 'data_deletion' %}nav-pill-active{% else %}hover:text-stone-900{% endif %}">
+                    Panduan Hapus Data
+                </a>
+            </nav>
+
+            <!-- Action CTA -->
+            <div class="flex items-center gap-3">
+                {% if request.user.is_authenticated %}
+                <a href="/" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg text-white transition-all shadow-sm" style="background-color: var(--brand-green);">
+                    Buka Studio &rarr;
+                </a>
+                {% else %}
+                <a href="{% url 'account_login' %}" class="text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg text-white transition-all shadow-sm" style="background-color: var(--brand-green);">
+                    Masuk ke Studio
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mobile Nav Tabs -->
+        <div class="md:hidden flex overflow-x-auto px-4 py-2 gap-1.5 bg-stone-50 border-t border-stone-200 text-xs scrollbar-none">
+            <a href="{% url 'terms' %}" class="px-3 py-1.5 rounded-lg whitespace-nowrap {% if active_tab == 'terms' %}bg-white text-stone-900 font-semibold shadow-sm{% else %}text-stone-600{% endif %}">
+                Ketentuan Layanan
+            </a>
+            <a href="{% url 'privacy' %}" class="px-3 py-1.5 rounded-lg whitespace-nowrap {% if active_tab == 'privacy' %}bg-white text-stone-900 font-semibold shadow-sm{% else %}text-stone-600{% endif %}">
+                Kebijakan Privasi
+            </a>
+            <a href="{% url 'data_deletion' %}" class="px-3 py-1.5 rounded-lg whitespace-nowrap {% if active_tab == 'data_deletion' %}bg-white text-stone-900 font-semibold shadow-sm{% else %}text-stone-600{% endif %}">
+                Panduan Hapus Data
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 py-10 px-4 sm:px-6">
+        <div class="max-w-4xl mx-auto">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 py-8 px-4 sm:px-6 text-center text-xs text-stone-500">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <img src="{% static 'img/brightbean-studio-logo.webp' %}" alt="RTK Studio" class="w-5 h-5 object-contain">
+                <span>&copy; 2026 RTK Studio. Seluruh hak cipta dilindungi undang-undang.</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-stone-600">
+                <a href="{% url 'terms' %}" class="hover:underline">Ketentuan Layanan</a>
+                <span>&bull;</span>
+                <a href="{% url 'privacy' %}" class="hover:underline">Kebijakan Privasi</a>
+                <span>&bull;</span>
+                <a href="{% url 'data_deletion' %}" class="hover:underline">Penghapusan Data</a>
+                <span>&bull;</span>
+                <a href="mailto:support@rtk.my.id" class="hover:underline">Kontak Support</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -25,7 +25,14 @@ EXEMPT_PATH_PREFIXES = (
     "/health/",
     "/static/",
     "/admin/",
+    "/terms/",
+    "/terms-of-service/",
+    "/privacy/",
+    "/privacy-policy/",
+    "/data-deletion/",
+    "/panduan-penghapusan-data/",
 )
+
 
 
 class TosAcceptanceMiddleware:
